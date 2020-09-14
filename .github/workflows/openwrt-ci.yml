@@ -10,11 +10,11 @@
 name: OpenWrt-CI
 
 on:
-#  push:
-#    branches: 
-#      - master
-  # schedule:
-  #   - cron: 0 20 * * *
+  push:
+    branches: 
+      - master
+  schedule:
+    - cron: 0 20 * * *
   release:
     types: [published]
 
@@ -57,7 +57,22 @@ jobs:
           # ln -s /mnt/openwrt/staging_dir ./staging_dir
 
           df -h
-
+          
+      - name: 同步最新的源码
+        run: |
+          git remote add openwrt https://github.com/coolsnowwolf/lede.git
+          git pull openwrt master
+          git remote -v
+          
+      - name: 自定义插件主题
+        run: |
+          cd package
+          mkdir openwrt-packages
+          cd openwrt-packages
+          git clone https://github.com/kenzok8/openwrt-packages.git
+          git clone https://github.com/kenzok8/small.git
+          git clone https://github.com/jerrykuku/openwrt-package.git
+          
       - name: Update feeds
         run: |
           ./scripts/feeds update -a
@@ -72,11 +87,179 @@ jobs:
           # 在 cat >> .config <<EOF 到 EOF 之间粘贴你的编译配置, 需注意缩进关系
           # 例如:
 
+          # cat >> .config <<EOF
+          # CONFIG_TARGET_IMAGES_GZIP=y
+          # CONFIG_KERNEL_BUILD_USER="OpenWrt-CI"
+          # CONFIG_KERNEL_BUILD_DOMAIN="Azure"
+          # EOF
+          
+          # 编译x64固件:
+          cat >> .config <<EOF
+          CONFIG_TARGET_x86=y
+          CONFIG_TARGET_x86_64=y
+          CONFIG_TARGET_x86_64_Generic=y
+          EOF
+
+          # 固件压缩:
           cat >> .config <<EOF
           CONFIG_TARGET_IMAGES_GZIP=y
-          CONFIG_KERNEL_BUILD_USER="OpenWrt-CI"
-          CONFIG_KERNEL_BUILD_DOMAIN="Azure"
           EOF
+
+          # 编译UEFI固件:
+          # cat >> .config <<EOF
+          # CONFIG_EFI_IMAGES=y
+          # EOF
+
+          # IPv6支持:
+          # cat >> .config <<EOF
+          # CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
+          # CONFIG_PACKAGE_ipv6helper=y
+          # EOF
+
+          # 多文件系统支持:
+          # cat >> .config <<EOF
+          # CONFIG_PACKAGE_kmod-fs-nfs=y
+          # CONFIG_PACKAGE_kmod-fs-nfs-common=y
+          # CONFIG_PACKAGE_kmod-fs-nfs-v3=y
+          # CONFIG_PACKAGE_kmod-fs-nfs-v4=y
+          # CONFIG_PACKAGE_kmod-fs-ntfs=y
+          # CONFIG_PACKAGE_kmod-fs-squashfs=y
+          # EOF
+
+          # USB3.0支持:
+          # cat >> .config <<EOF
+          # CONFIG_PACKAGE_kmod-usb-ohci=y
+          # CONFIG_PACKAGE_kmod-usb-ohci-pci=y
+          # CONFIG_PACKAGE_kmod-usb2=y
+          # CONFIG_PACKAGE_kmod-usb2-pci=y
+          # CONFIG_PACKAGE_kmod-usb3=y
+          # EOF
+
+          # 常用LuCI插件选择:
+          cat >> .config <<EOF
+          CONFIG_PACKAGE_luci-app-accesscontrol=y
+          CONFIG_PACKAGE_luci-app-adbyby-plus=y
+          CONFIG_PACKAGE_luci-app-adguardhome=y
+          CONFIG_PACKAGE_luci-app-advanced-reboot=y
+          CONFIG_PACKAGE_luci-app-advancedsetting=y
+          CONFIG_PACKAGE_luci-app-ahcp=y
+          CONFIG_PACKAGE_luci-app-airplay2=y
+          CONFIG_PACKAGE_luci-app-aria2=y
+          CONFIG_DEFAULT_luci-app-arpbind=y
+          CONFIG_DEFAULT_luci-app-attendedsysupgrade=y
+          CONFIG_DEFAULT_luci-app-autoreboot=y
+          CONFIG_PACKAGE_luci-app-baidupcs-web=y
+          CONFIG_PACKAGE_luci-app-clash=y
+          CONFIG_DEFAULT_luci-app-ddns=y
+          CONFIG_DEFAULT_luci-app-diskman_INCLUDE_btrfs-progs=y
+          CONFIG_DEFAULT_luci-app-diskman_INCLUDE_lsblk=y
+          CONFIG_DEFAULT_luci-app-diskman_INCLUDE_mdadm=y
+          CONFIG_DEFAULT_luci-app-diskman_INCLUDE_kmod-md-raid456=y
+          CONFIG_DEFAULT_luci-app-diskman_INCLUDE_kmod-md-linear=y
+          CONFIG_PACKAGE_luci-app-docker=y
+          CONFIG_PACKAGE_luci-app-eqos=y
+          CONFIG_DEFAULT_luci-app-filetransfer=y
+          CONFIG_DEFAULT_luci-app-firewall=y
+          CONFIG_PACKAGE_luci-app-flowoffload=y
+          CONFIG_PACKAGE_luci-app-frpc=y
+          CONFIG_PACKAGE_luci-app-gost=y
+          CONFIG_PACKAGE_luci-app-guest-wifi=y
+          CONFIG_PACKAGE_luci-app-haproxy-tcp=y
+          CONFIG_PACKAGE_luci-app-hd-idle=y
+          CONFIG_PACKAGE_luci-app-ipsec-vpnd=y
+          CONFIG_PACKAGE_luci-app-jd-dailybonus=y
+          CONFIG_PACKAGE_luci-app-kodexplorer=y
+          CONFIG_PACKAGE_luci-app-music-remote-center=y
+          CONFIG_PACKAGE_luci-app-mwan3=y
+          CONFIG_PACKAGE_luci-app-mwan3helper=y
+          CONFIG_DEFAULT_luci-app-nlbwmon=y
+          CONFIG_PACKAGE_luci-app-openclash=y
+          CONFIG_PACKAGE_luci-app-openvpn=y
+          CONFIG_PACKAGE_luci-app-openvpn-server=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Shadowsocks=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Shadowsocks Server=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_ShadowsocksR=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_ShadowsocksR Server=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_V2ray=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Trojan_Plus=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Trojan_Go=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Brook=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Kcptun=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_haproxy=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_ChinaDNS-NG=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Https DNS Proxy(DoH)=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Dns2socks=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_V2ray-plugin (Shadowsocks plugin)=y
+          CONFIG_PACKAGE_luci-app-passwall_INCLUDE_simple-obfs (Shadowsocks plugin)=y
+          CONFIG_PACKAGE_luci-app-polipo=y
+          CONFIG_PACKAGE_luci-app-pppoe-relay=y
+          CONFIG_PACKAGE_luci-app-qbittorrent=y
+          CONFIG_PACKAGE_luci-app-qos=y
+          CONFIG_DEFAULT_luci-app-ramfree=y
+          CONFIG_DEFAULT_luci-app-samba=y
+          CONFIG_PACKAGE_luci-app-sfe=y
+          CONFIG_PACKAGE_luci-app-smartdns=y
+          CONFIG_PACKAGE_luci-app-softethervpn=y
+          CONFIG_PACKAGE_luci-app-sqm=y          
+          CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Shadowsocks V2ray Plugin=y
+          CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray=y
+          CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Trojan=y
+          CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_NaiveProxy=y
+          CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Redsocks 2=y
+          CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Kcptun=y
+          CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Server=y         
+          CONFIG_DEFAULT_luci-app-syncdial=y
+          CONFIG_PACKAGE_luci-app-transmission=y
+          CONFIG_PACKAGE_luci-app-ttyd=y
+          CONFIG_DEFAULT_luci-app-unblockmusic=y         
+          CONFIG_DEFAULT_luci-app-upnp=y
+          CONFIG_PACKAGE_luci-app-usb-printer=y
+          CONFIG_PACKAGE_luci-app-verysync=y
+          CONFIG_PACKAGE_luci-app-vlmcsd=y
+          CONFIG_PACKAGE_luci-app-webadmin=y
+          CONFIG_PACKAGE_luci-app-wireguard=y
+          CONFIG_PACKAGE_luci-app-wrtbwmon=y
+          CONFIG_DEFAULT_luci-app-accesscontrol=y
+          CONFIG_DEFAULT_luci-app-vlmcsd=y
+          CONFIG_DEFAULT_luci-app-vsftpd=y
+          CONFIG_PACKAGE_luci-app-vssr_INCLUDE_Shadowsocks V2ray Plugin=y
+          CONFIG_PACKAGE_luci-app-vssr_INCLUDE_V2ray=y
+          CONFIG_PACKAGE_luci-app-vssr_INCLUDE_Trojan=y
+          CONFIG_PACKAGE_luci-app-vssr_INCLUDE_Kcptun=y
+          CONFIG_PACKAGE_luci-app-vssr_INCLUDE_ShadowsocksR Server=y
+          CONFIG_PACKAGE_luci-app-watchcat=y
+          CONFIG_DEFAULT_luci-app-webadmin=y
+          CONFIG_DEFAULT_luci-app-wol=y
+          CONFIG_PACKAGE_luci-app-wrtbwmon=y
+          CONFIG_DEFAULT_luci-app-xlnetacc=y
+          CONFIG_DEFAULT_luci-app-zerotier=y
+          EOF
+
+          # LuCI主题:
+          cat >> .config <<EOF
+          CONFIG_PACKAGE_luci-theme-argon=y
+          CONFIG_PACKAGE_luci-theme-argon-18.06=y
+          CONFIG_PACKAGE_luci-theme-atmaterial=y
+          CONFIG_PACKAGE_luci-theme-bootstrap=y
+          CONFIG_PACKAGE_luci-theme-edge=y
+          CONFIG_PACKAGE_luci-theme-freifunk-generic=y
+          CONFIG_PACKAGE_luci-theme-ifit=y
+          CONFIG_PACKAGE_luci-theme-material=y
+          CONFIG_PACKAGE_luci-theme-netgear=y
+          CONFIG_PACKAGE_luci-theme-opentomato=y
+          CONFIG_PACKAGE_luci-theme-opentomcat=y
+          EOF
+
+          # 常用软件包:
+          # cat >> .config <<EOF
+          # CONFIG_PACKAGE_curl=y
+          # CONFIG_PACKAGE_htop=y
+          # CONFIG_PACKAGE_nano=y
+          # CONFIG_PACKAGE_screen=y
+          # CONFIG_PACKAGE_tree=y
+          # CONFIG_PACKAGE_vim-fuller=y
+          # CONFIG_PACKAGE_wget=y
+          # EOF
 
           #
           # ===============================================================
