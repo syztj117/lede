@@ -145,11 +145,6 @@ jobs:
           CONFIG_PACKAGE_luci-app-baidupcs-web=y
           CONFIG_PACKAGE_luci-app-clash=y
           CONFIG_DEFAULT_luci-app-ddns=y
-          # CONFIG_DEFAULT_luci-app-diskman_INCLUDE_btrfs-progs=y
-          # CONFIG_DEFAULT_luci-app-diskman_INCLUDE_lsblk=y
-          # CONFIG_DEFAULT_luci-app-diskman_INCLUDE_mdadm=y
-          # CONFIG_DEFAULT_luci-app-diskman_INCLUDE_kmod-md-raid456=y
-          # CONFIG_DEFAULT_luci-app-diskman_INCLUDE_kmod-md-linear=y
           CONFIG_PACKAGE_luci-app-docker=y
           CONFIG_PACKAGE_luci-app-eqos=y
           CONFIG_DEFAULT_luci-app-filetransfer=y
@@ -196,14 +191,7 @@ jobs:
           CONFIG_PACKAGE_luci-app-sfe=y
           CONFIG_PACKAGE_luci-app-smartdns=y
           CONFIG_PACKAGE_luci-app-softethervpn=y
-          CONFIG_PACKAGE_luci-app-sqm=y          
-          # CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Shadowsocks V2ray Plugin=y
-          # CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray=y
-          # CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Trojan=y
-          # CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_NaiveProxy=y
-          # CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Redsocks 2=y
-          # CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Kcptun=y
-          # CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Server=y         
+          CONFIG_PACKAGE_luci-app-sqm=y               
           CONFIG_DEFAULT_luci-app-syncdial=y
           CONFIG_PACKAGE_luci-app-transmission=y
           CONFIG_PACKAGE_luci-app-ttyd=y
@@ -234,7 +222,6 @@ jobs:
 
           # LuCI主题:
           cat >> .config <<EOF
-          CONFIG_PACKAGE_luci-theme-argon=y
           CONFIG_PACKAGE_luci-theme-argon-18.06=y
           CONFIG_PACKAGE_luci-theme-atmaterial=y
           CONFIG_PACKAGE_luci-theme-bootstrap=y
@@ -248,15 +235,15 @@ jobs:
           EOF
 
           # 常用软件包:
-          cat >> .config <<EOF
-          CONFIG_PACKAGE_curl=y
-          CONFIG_PACKAGE_htop=y
-          CONFIG_PACKAGE_nano=y
-          CONFIG_PACKAGE_screen=y
-          CONFIG_PACKAGE_tree=y
-          CONFIG_PACKAGE_vim-fuller=y
-          CONFIG_PACKAGE_wget=y
-          EOF
+          # cat >> .config <<EOF
+          # CONFIG_PACKAGE_curl=y
+          # CONFIG_PACKAGE_htop=y
+          # CONFIG_PACKAGE_nano=y
+          # CONFIG_PACKAGE_screen=y
+          # CONFIG_PACKAGE_tree=y
+          # CONFIG_PACKAGE_vim-fuller=y
+          # CONFIG_PACKAGE_wget=y
+          # EOF
 
           #
           # ===============================================================
